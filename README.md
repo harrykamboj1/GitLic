@@ -1,29 +1,36 @@
-# Create T3 App
+# GitLic - AI GitHub Developer Tool
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+GitLic is a full-stack SaaS tool designed to help developers work and collaborate on complex projects. It leverages an end-to-end RAG (Retrieve, Augment, Generate) pipeline to provide an intuitive and efficient experience for managing GitHub repositories and pull requests.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+1. **Credit-Based System**  
+   A credit-based system to manage and track usage of various services within the platform.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+2. **Repository Comment Summary**  
+   Get a summary of all the comments made by other users within a repository. Stay updated without having to read every comment individually.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+3. **Code & Pull Request Question Answering**  
+   Ask questions related to the code in the repository or the pull request you've made. GitLic provides intelligent responses to help clarify any doubts.
 
-## Learn More
+4. **Meeting Processing (Missed Meetings)**  
+   Missed a meeting? GitLic can process and summarize the key points of the meeting for you.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+5. **Meeting Summary and Chat**  
+   Get a brief description of the meeting and chat with the meeting details. This feature helps you catch up quickly and stay on top of important discussions.
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## How to Use
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+1. Sign up or log in to GitLic.
+2. Integrate your GitHub repositories and sync your pull requests.
+3. Start utilizing features like summary generation, question answering, and meeting processing.
 
-## How do I deploy this?
+## Installation
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+To install GitLic locally for development, clone the repository and follow the setup instructions.
+
+```bash
+git clone https://github.com/your-repo/gitlic.git
+cd gitlic
+npm install
+npm run dev

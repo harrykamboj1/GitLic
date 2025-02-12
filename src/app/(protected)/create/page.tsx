@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useRefetch from "@/hooks/use-refetch";
 import { api } from "@/trpc/react";
 import Image from "next/image";
 import React from "react";
@@ -14,12 +15,16 @@ type FormInput = {
 };
 
 const CreatePage = () => {
-  const { register, handleSubmit, reset } = useForm<FormInput>();
-  const createProject = api.project.createProject.useMutation();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormInput>();
 
+  const createProject = api.project.createProject.useMutation();
+  const refetch = useRefetch();
   function onSubmit(data: FormInput) {
-    debugger;
-    window.alert(JSON.stringify(data));
     createProject.mutate(
       {
         githubUrl: data.repoUrl,
@@ -29,6 +34,7 @@ const CreatePage = () => {
       {
         onSuccess: () => {
           toast.success("Project Created Successfully");
+          refetch();
           reset();
         },
         onError: () => {
@@ -62,15 +68,35 @@ const CreatePage = () => {
               type="text"
               required
               placeholder="Project Name"
-              {...register("projectName")}
+              {...register("projectName", {
+                pattern: {
+                  value: /^[a-zA-Z0-9\s]+$/,
+                  message:
+                    "Project name can only contain letters, numbers and spaces",
+                },
+              })}
             />
+            {errors.projectName && (
+              <p className="text-sm text-red-500">
+                {errors.projectName.message}
+              </p>
+            )}
             <div className="h-2"></div>
             <Input
-              type="url"
-              required
+              type="text"
               placeholder="Github URL"
-              {...register("repoUrl")}
+              {...register("repoUrl", {
+                required: "GitHub URL is required",
+                pattern: {
+                  value:
+                    /^(https?:\/\/)?(www\.)?github\.com\/[A-Za-z0-9-_.]+(\/[A-Za-z0-9-_.]+)?$/,
+                  message: "Invalid GitHub URL",
+                },
+              })}
             />
+            {errors.repoUrl && (
+              <p className="text-sm text-red-500">{errors.repoUrl.message}</p>
+            )}
             <div className="h-2"></div>
             <Input
               placeholder="Github Token (Optional)"

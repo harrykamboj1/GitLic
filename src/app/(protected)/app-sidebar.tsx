@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import useProject from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
 import {
   Bot,
@@ -23,15 +24,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
-
-export const projects = [
-  {
-    name: "Project1",
-  },
-  {
-    name: "Project2",
-  },
-];
 
 export const items = [
   {
@@ -59,6 +51,7 @@ export const items = [
 export function AppSidebar() {
   const pathname = usePathname();
   const { open } = useSidebar();
+  const { projects, projectId, setProjectId } = useProject();
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarHeader className="flex items-center justify-center">
@@ -106,16 +99,19 @@ export function AppSidebar() {
           <SidebarGroupLabel>Your Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {projects.map((project) => {
+              {projects?.map((project) => {
                 return (
                   <SidebarMenuItem key={project.name}>
                     <SidebarMenuButton asChild>
-                      <div className="transition-all ease-in-out hover:cursor-pointer hover:!bg-blue-500 hover:!text-white">
+                      <div
+                        onClick={() => setProjectId(project.id)}
+                        className="transition-all ease-in-out hover:cursor-pointer hover:!bg-blue-500 hover:!text-white"
+                      >
                         <div
                           className={cn(
                             "flex size-5 items-center justify-center rounded-sm border bg-white text-sm text-primary",
                             {
-                              "bg-primary text-white": true,
+                              "bg-primary text-white": project.id === projectId,
                             },
                           )}
                         >

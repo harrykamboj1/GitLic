@@ -71,3 +71,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.code-highlight{
+  background: green;
+  color: white;
+}

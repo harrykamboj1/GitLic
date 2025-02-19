@@ -31,25 +31,25 @@ const CommitLog = () => {
                   alt="commit Avatar"
                   className="relative mt-4 size-8 flex-none rounded-full bg-gray-50"
                 />
-                <div className="flex-auto rounded-md bg-white p-3 ring-1 ring-inset ring-gray-200 dark:bg-slate-950">
+                <div className="flex-auto rounded-md bg-white p-3 ring-1 ring-inset ring-gray-200">
                   <div className="flex justify-between gap-x-4">
                     <Link
                       href={`${project?.githubUrl}/commits/${commit.commitHash}`}
                       target="_blank"
                       className="py-0.5 text-xs leading-5 text-gray-500"
                     >
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-gray-900">
                         {commit.commitAuthorName}
                       </span>{" "}
-                      <span className="inline-flex items-center dark:text-gray-400">
+                      <span className="inline-flex items-center">
                         commited <ExternalLink className="ml-1 size-4" />
                       </span>
                     </Link>
                   </div>
-                  <span className="font-400 text-black dark:text-white">
+                  <span className="font-400 text-black">
                     {commit.commitMessage}
                   </span>
-                  <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500 dark:text-gray-300">
+                  <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500">
                     {commit.summary}
                   </pre>
                 </div>

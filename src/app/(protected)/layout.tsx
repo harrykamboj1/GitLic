@@ -17,7 +17,7 @@ const SidebarLayout = ({ children }: Props) => {
         <div className="flex items-center gap-2 rounded-md border border-sidebar-border bg-sidebar p-2 shadow">
           {/* SearchBar */}
           <div className="ml-auto"></div>
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <UserButton
             appearance={{
               elements: {

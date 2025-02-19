@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 import { authProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { pollCommits } from "@/lib/github";
 import { indexGithubRepo } from "@/lib/langchain-github-loader";
@@ -47,5 +47,24 @@ export const projectRouter = createTRPCRouter({
                 projectId:input.projectId
             }
         })
+    }),
+    saveAnswers: authProcedure.input(z.object({
+        projectId:z.string(),
+        question:z.string(),
+        fileReferences:z.any(),
+        answer:z.string(),
+
+    })).mutation(async ({ctx,input})=>{
+        const result =  await ctx.db.question.create({
+            data:{
+                answer:input.answer,
+                question:input.question,
+                fileReferences:input.fileReferences,
+                projectId:input.projectId,
+                userId:ctx.user.userId!
+            }
+        })
+
+        return result;
     })
 })

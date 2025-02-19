@@ -15,6 +15,8 @@ import { readStreamableValue } from "ai/rsc";
 import MDEditor from "@uiw/react-md-editor";
 import { useTheme } from "next-themes";
 import { CodeReferences } from "./code-references";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 const QuestionCard = () => {
   const { theme } = useTheme();
@@ -24,6 +26,7 @@ const QuestionCard = () => {
   const [question, setQuestion] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const saveAnswer = api.project.saveAnswers.useMutation();
   const [fileReferences, setFileReferences] = useState<
     {
       fileName: string;
@@ -59,20 +62,50 @@ const QuestionCard = () => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[80vw]">
+        <DialogContent className="sm:max-w-[90vw]">
           <DialogHeader>
-            <DialogTitle>
-              <Image src={"/logo.png"} alt="logo" width={40} height={40} />
-            </DialogTitle>
+            <div className="flex items-center gap-2">
+              <DialogTitle>
+                <Image src={"/logo.png"} alt="logo" width={40} height={40} />
+              </DialogTitle>
+              <Button
+                disabled={saveAnswer.isPending}
+                variant={"outline"}
+                onClick={() =>
+                  saveAnswer.mutate(
+                    {
+                      projectId: project!.id,
+                      answer: answer,
+                      question: question,
+                      fileReferences: fileReferences,
+                    },
+                    {
+                      onSuccess: () => {
+                        toast.success("Answer Saved Successfully");
+                      },
+                      onError: () => {
+                        toast.error("Something went wrong");
+                      },
+                    },
+                  )
+                }
+              >
+                Save Answer
+              </Button>
+            </div>
           </DialogHeader>
           <MDEditor.Markdown
             source={answer}
             style={{ background: "white", color: "black" }}
-            className="!h-full max-h-[40vh] max-w-[70vw] overflow-scroll"
+            className="h-full max-h-[30vh] max-w-[80vw] overflow-scroll"
           />
           <div className="h-4"></div>
           <CodeReferences fileReferences={fileReferences} />
-          <Button type="button" onClick={() => setOpen(false)}>
+          <Button
+            className="max-w-[90vw]"
+            type="button"
+            onClick={() => setOpen(false)}
+          >
             Close
           </Button>
         </DialogContent>

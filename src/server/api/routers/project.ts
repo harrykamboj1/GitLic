@@ -66,5 +66,22 @@ export const projectRouter = createTRPCRouter({
         })
 
         return result;
+    }),
+    getQuestions:authProcedure.input(z.object({
+        projectId:z.string()
+    })).query(async({ctx,input})=>{
+        const result = await ctx.db.question.findMany({
+            where:{
+                projectId:input.projectId
+            },
+            include:{
+                user:true
+            },
+            orderBy:{
+                createdAt: 'desc'
+            }
+        })
+
+        return result;
     })
 })

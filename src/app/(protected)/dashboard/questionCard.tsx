@@ -17,6 +17,7 @@ import { useTheme } from "next-themes";
 import { CodeReferences } from "./code-references";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import useRefetch from "@/hooks/use-refetch";
 
 const QuestionCard = () => {
   const { theme } = useTheme();
@@ -59,6 +60,8 @@ const QuestionCard = () => {
 
     setLoading(false);
   };
+  const refetch = useRefetch();
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -71,7 +74,7 @@ const QuestionCard = () => {
               <Button
                 disabled={saveAnswer.isPending}
                 variant={"outline"}
-                onClick={() =>
+                onClick={async () =>
                   saveAnswer.mutate(
                     {
                       projectId: project!.id,
@@ -82,6 +85,7 @@ const QuestionCard = () => {
                     {
                       onSuccess: () => {
                         toast.success("Answer Saved Successfully");
+                        refetch();
                       },
                       onError: () => {
                         toast.error("Something went wrong");

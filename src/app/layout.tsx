@@ -20,15 +20,8 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
-          {/* <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          > */}
           <TRPCReactProvider>{children}</TRPCReactProvider>
           <Toaster richColors />
-          {/* </ThemeProvider> */}
         </body>
       </html>
     </ClerkProvider>

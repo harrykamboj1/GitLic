@@ -44,7 +44,7 @@ async function summariseCommit(githubUrl:string,commitHash:string) {
             Accept:'application/vnd.github.v3.diff'
         }
     })
-
+    
     return await generateAiSummariseCommit(data) || ""
 }
 export const pollCommits = async (projectId:string) => {
@@ -54,6 +54,7 @@ export const pollCommits = async (projectId:string) => {
     const summaryResponses = await Promise.allSettled(unprocessCommits.map((commit)=> {
         return summariseCommit(githubUrl,commit.commitHash)
     }))
+    console.log(`summaryResponses`,summaryResponses)
     const summaries = summaryResponses.map(response => {
         if(response.status === 'fulfilled'){
             return response.value

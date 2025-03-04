@@ -83,5 +83,46 @@ export const projectRouter = createTRPCRouter({
         })
 
         return result;
+    }),
+    uploadMeeting: authProcedure.input(
+        z.object({
+            name:z.string(),
+            meetingUrl:z.string(),
+            projectId: z.string(),
+        })
+    ).mutation(async ( {ctx,input} ) => {
+        const result = await ctx.db.meeting.create({
+            data:{
+                meetingUrl: input.meetingUrl,
+                name:input.name,
+                projectId:input.projectId,
+            }
+        })
+        return result;
+    }),
+    getMeetings: authProcedure.input(z.object({
+        projectId:z.string(),
+    })).query(async ({ctx,input})=>{
+        const meetings = await ctx.db.meeting.findMany({
+            where:{
+                projectId:input.projectId
+            },
+            include:{
+                Issues:true,
+            }
+        })
+
+        return meetings;
+    }),
+    deleteMeetings: authProcedure.input(z.object({
+        meetingId:z.string(),
+    })).mutation(async ({ctx,input})=>{ 
+        const result = await ctx.db.meeting.delete({
+            where:{
+                id:input.meetingId
+            }
+        })
+
+        return result;
     })
 })

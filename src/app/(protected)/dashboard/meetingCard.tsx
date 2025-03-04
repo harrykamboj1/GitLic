@@ -5,11 +5,36 @@ import { Presentation } from "lucide-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { UploadDropzone } from "@/utils/uploadthing";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
+import useProject from "@/hooks/use-projects";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 const MeetingCard = () => {
+  const project = useProject();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const router = useRouter();
   const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+  const uploadMeeting = api.project.uploadMeeting.useMutation();
+  const processMeeting = useMutation({
+    mutationFn: async (data: {
+      meetingUrl: string;
+      meetingId: string;
+      projectId: string;
+    }) => {
+      const { meetingUrl, meetingId, projectId } = data;
+      const response = await axios.post("/api/process-meeting", {
+        meetingUrl,
+        meetingId,
+        projectId,
+      });
+
+      return response.data;
+    },
+  });
 
   return (
     <Card className="col-span-2 flex flex-col items-center justify-center p-2">
@@ -39,14 +64,40 @@ const MeetingCard = () => {
               }}
               onClientUploadComplete={(res) => {
                 setIsUploading(false);
+                console.log(res);
                 if (res && res.length > 0) {
                   setUploadedFileUrl(res[0]!.ufsUrl);
-                  window.alert(`Upload complete: ${res[0]?.ufsUrl}`);
+                  uploadMeeting.mutate(
+                    {
+                      projectId: project.projectId,
+                      meetingUrl: res[0]!.ufsUrl,
+                      name: res[0]!.name,
+                    },
+                    {
+                      onSuccess: async (meeting) => {
+                        toast.success(`Meeting uploaded Successfully`);
+                        router.push("/meetings");
+                        setUploadedFileUrl(null);
+                        await processMeeting.mutateAsync({
+                          meetingUrl: res[0]!.ufsUrl,
+                          meetingId: meeting.id,
+                          projectId: project.projectId,
+                        });
+                      },
+                      onError: (error) => {
+                        console.log(error);
+                        toast.error(`Something went wrong!`);
+                        setUploadedFileUrl(null);
+                      },
+                    },
+                  );
                 }
               }}
               onUploadError={(error) => {
                 setIsUploading(false);
-                alert(`ERROR! ${error.message}`);
+                console.log(error);
+                toast.error(`Something went wrong while uploading!`);
+                setUploadedFileUrl(null);
               }}
               config={{ mode: "auto" }}
             />
@@ -65,7 +116,7 @@ const MeetingCard = () => {
           </p>
         </div>
       )}
-      {uploadedFileUrl && !isUploading && (
+      {/* {uploadedFileUrl && !isUploading && (
         <div className="flex flex-col items-center justify-center">
           <Presentation className="h-10 w-10 text-green-500" />
           <h3 className="mt-2 text-sm font-semibold text-gray-900">
@@ -81,7 +132,7 @@ const MeetingCard = () => {
             Upload Another
           </button>
         </div>
-      )}
+      )} */}
     </Card>
   );
 };

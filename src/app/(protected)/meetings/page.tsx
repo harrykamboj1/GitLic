@@ -15,7 +15,7 @@ const MeetingPage = () => {
   const { data: meetings, isLoading } = api.project.getMeetings.useQuery(
     { projectId },
     {
-      refetchInterval: 10000,
+      refetchInterval: 50000,
     },
   );
 

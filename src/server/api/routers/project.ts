@@ -117,12 +117,32 @@ export const projectRouter = createTRPCRouter({
     deleteMeetings: authProcedure.input(z.object({
         meetingId:z.string(),
     })).mutation(async ({ctx,input})=>{ 
+        const result1 = await ctx.db.issues.deleteMany({
+            where:{
+                meetingId:input.meetingId
+            },
+        })
+
         const result = await ctx.db.meeting.delete({
             where:{
                 id:input.meetingId
-            }
+            },
         })
 
         return result;
+    }),
+    getMeetingById: authProcedure.input(z.object({
+        meetingId:z.string(),
+    })).query(async ({ctx,input})=>{
+        const meeting = await ctx.db.meeting.findUnique({
+            where:{
+                id:input.meetingId
+            },
+            include:{
+                Issues:true
+            }
+        })
+
+        return meeting;
     })
 })

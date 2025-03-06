@@ -6,6 +6,8 @@ import React from "react";
 import CommitLog from "./commitLog";
 import QuestionCard from "./questionCard";
 import MeetingCard from "./meetingCard";
+import { ArchieveButton } from "./archieve-project";
+import InviteButton from "./invite-button";
 
 const DashboardPage = () => {
   const { project } = useProject();
@@ -30,7 +32,9 @@ const DashboardPage = () => {
         <div className="h-4"></div>
 
         <div className="flex items-center gap-4">
-          Team Members Invite Button Archive Button
+          Team Members
+          <InviteButton />
+          <ArchieveButton />
         </div>
       </div>
 

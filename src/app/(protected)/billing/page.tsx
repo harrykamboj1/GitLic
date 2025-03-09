@@ -18,7 +18,7 @@ export default function RazorpayButton() {
   const [creditsToBuy, setCreditsToBuy] = useState<number[]>([100]);
 
   const creditsToBuyAmount = creditsToBuy[0] ?? 100;
-  const price = (creditsToBuyAmount / 5).toFixed(2);
+  const price = (creditsToBuyAmount / 2).toFixed(2);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -35,7 +35,7 @@ export default function RazorpayButton() {
     setLoading(true);
     try {
       const { data } = await axios.post("/api/create-order", {
-        amount: Math.round(credits / 5),
+        amount: Math.round(credits / 2),
         currency: "INR",
       });
 

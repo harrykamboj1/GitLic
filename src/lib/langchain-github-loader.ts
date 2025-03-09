@@ -2,11 +2,63 @@ import { GithubRepoLoader } from "@langchain/community/document_loaders/web/gith
 import { Document } from "@langchain/core/documents";
 import { aiGenerateEmbeddings, summariseCode } from "./gemini";
 import { db } from "@/server/db";
+import { Octokit } from "octokit";
+
+
+export const getfileCount = async (path:string,octokit:Octokit,githubOwner:string,githubRepo:string,acc: number = 0)=>{
+
+  const {data} = await octokit.rest.repos.getContent({
+    owner:githubOwner,
+    repo:githubRepo,
+    path
+  })
+  if(!Array.isArray(data) && data.type === 'file'){
+    return acc + 1;
+  }
+  if(Array.isArray(data)){
+    let fileCount = 0;
+    const directories: string[] = []
+    for(const item of data){
+      if(item.type === 'dir'){
+        directories.push(item.path)
+      }else{
+        fileCount++;
+      }
+    }
+    if(directories.length > 0){
+      const directoryCount = await Promise.all(
+        directories.map(dirPath=> getfileCount(dirPath,octokit,githubOwner,githubRepo,0))
+      )
+      if(directoryCount == null || directoryCount == undefined){
+        return fileCount;
+      }else{
+        const res =  directoryCount.reduce((acc, count) => acc + count, 0);
+        fileCount = fileCount + res;
+      }
+    }
+
+    return fileCount + acc;
+  }
+  return acc;
+}
+
+export const checkCredits = async (githubUrl:string,githubToken:string)=>{
+
+  const octokit = new Octokit({ auth:process.env.GITHUB_ACCESS_TOKEN})
+  const githubOwner = githubUrl.split('/')[3];
+  const githubRepo = githubUrl.split('/')[4];
+  if(!githubOwner || !githubRepo){
+    return 0;
+  }
+  const repo  = githubRepo.split('.').length >= 2 ? githubRepo.split('.')[0] : githubRepo;
+  const fileCount = await getfileCount('',octokit,githubOwner,repo!,0);
+  return fileCount;
+}
 export const loadGithubRepo = async (githubUrl: string, githubToken?: string) => {
     const loader = new GithubRepoLoader(
         githubUrl,
         {
-          accessToken:githubToken ?? '',
+          accessToken: process.env.GITHUB_PERSONAL_TOKEN,
           branch: "main",
           recursive: true,
           unknown: "warn",
@@ -20,6 +72,10 @@ export const loadGithubRepo = async (githubUrl: string, githubToken?: string) =>
 
 export const  indexGithubRepo = async (projectId:string,githubUrl:string,githubToken:string)=>{
   const docs = await loadGithubRepo(githubUrl,githubToken);
+ 
+  if(!docs){
+    return;
+  }
   const allEmbeddings = await generateEmbeddings(docs);
   await Promise.allSettled(allEmbeddings.map(async(embedding,index)=> {
     console.log(`processing ${index} of ${allEmbeddings.length}`)

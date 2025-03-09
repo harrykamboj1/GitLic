@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useRefetch from "@/hooks/use-refetch";
 import { api } from "@/trpc/react";
+import { Info } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -21,29 +22,39 @@ const CreatePage = () => {
     reset,
     formState: { errors },
   } = useForm<FormInput>();
-
+  const checkCredits = api.project.checkCredits.useMutation();
   const createProject = api.project.createProject.useMutation();
   const refetch = useRefetch();
   function onSubmit(data: FormInput) {
-    createProject.mutate(
-      {
-        githubUrl: data.repoUrl,
+    if (!!checkCredits.data) {
+      createProject.mutate(
+        {
+          githubUrl: data.repoUrl,
+          githubToken: data.githubToken,
+          name: data.projectName,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Project Created Successfully");
+            void refetch();
+            reset();
+          },
+          onError: () => {
+            toast.error("Failed to create Project");
+          },
+        },
+      );
+    } else {
+      checkCredits.mutate({
+        githuburl: data.repoUrl,
         githubToken: data.githubToken,
-        name: data.projectName,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Project Created Successfully");
-          refetch();
-          reset();
-        },
-        onError: () => {
-          toast.error("Failed to create Project");
-        },
-      },
-    );
-    return true;
+      });
+    }
   }
+
+  const hasCredits = checkCredits.data?.userCredits
+    ? checkCredits.data.fileCount <= checkCredits.data.userCredits
+    : true;
   return (
     <div className="flex h-full items-center justify-center gap-12">
       <Image
@@ -102,9 +113,39 @@ const CreatePage = () => {
               placeholder="Github Token (Optional)"
               {...register("githubToken")}
             />
+            {!!checkCredits.data && (
+              <>
+                <div className="mt-4 rounded-md border-orange-200 bg-orange-50 px-4 py-2 text-orange-700">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div className="flex items-center justify-center gap-x-2">
+                        <Info className="size-4" />
+                        <p className="text-sm">
+                          You will be charged{" "}
+                          <strong>{checkCredits.data.fileCount}</strong> credits
+                          for this repository
+                        </p>
+                      </div>
+                      <p className="ml-6 text-sm text-blue-600">
+                        You have{" "}
+                        <strong>{checkCredits.data?.userCredits} </strong>
+                        credits remaining
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
             <div className="h-2"></div>
-            <Button type="submit" disabled={createProject.isPending}>
-              Create Project
+            <Button
+              type="submit"
+              disabled={
+                createProject.isPending ||
+                !!checkCredits.isPending ||
+                !hasCredits
+              }
+            >
+              {!!checkCredits.data ? "Create Project" : "Check Credits"}
             </Button>
           </form>
         </div>

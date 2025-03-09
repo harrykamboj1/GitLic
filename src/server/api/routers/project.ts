@@ -168,5 +168,22 @@ export const projectRouter = createTRPCRouter({
             include:{
                 user:true
             }
-        })})
+        })}),
+
+    getUserDetailsWithCredits: authProcedure.query(async ({ctx})=>{
+            return await ctx.db.user.findUnique({where:{
+                id:ctx.user.userId!
+            }});
+        }),
+
+
+        updateCredits: authProcedure.input(z.object({ credits:z.number() })).mutation(async ({ctx,input})=>{
+            return  await ctx.db.user.update({
+                 where:{
+                    id:ctx.user.userId!
+                 },data:{
+                    credits:{increment:input.credits}
+                }
+                 
+             })}),
 })

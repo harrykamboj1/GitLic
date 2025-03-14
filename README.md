@@ -1,5 +1,8 @@
 # GitLic - AI GitHub Developer Tool
 
+
+![Gitlic](https://github.com/user-attachments/assets/53e43875-e8a3-46b1-b601-ab8ec5758222)
+
 GitLic is a full-stack SaaS tool designed to help developers work and collaborate on complex projects. It leverages an end-to-end RAG (Retrieve, Augment, Generate) pipeline to provide an intuitive and efficient experience for managing GitHub repositories and pull requests.
 
 ## Features

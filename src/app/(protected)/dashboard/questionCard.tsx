@@ -127,7 +127,11 @@ const QuestionCard = () => {
               onChange={(e) => setQuestion(e.target.value)}
             />
             <div className="h-4"></div>
-            <Button type="submit" className="text-white" disabled={loading}>
+            <Button
+              type="submit"
+              className="text-white"
+              disabled={loading || !project}
+            >
               Ask Gitlic
             </Button>
           </form>

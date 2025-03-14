@@ -14,6 +14,17 @@ import dynamic from "next/dynamic";
 
 const DashboardPage = () => {
   const { project } = useProject();
+  if (!project) {
+    return (
+      <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-2">
+        <Github className="size-12 text-muted-foreground" />
+        <h2 className="text-2xl font-bold text-primary">No Project Found</h2>
+        <p className="text-muted-foreground">
+          Please select or create a project to continue
+        </p>
+      </div>
+    );
+  }
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-y-4 px-4 py-2">

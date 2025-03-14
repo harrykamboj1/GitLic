@@ -4,6 +4,15 @@ import { aiGenerateEmbeddings, summariseCode } from "./gemini";
 import { db } from "@/server/db";
 import { Octokit } from "octokit";
 
+const ignoreFiles = [
+  'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'bun.lockb',
+  '.gitignore',
+  '*.md' // This needs special handling
+];
+
 
 export const getfileCount = async (path:string,octokit:Octokit,githubOwner:string,githubRepo:string,acc: number = 0)=>{
 
@@ -12,13 +21,27 @@ export const getfileCount = async (path:string,octokit:Octokit,githubOwner:strin
     repo:githubRepo,
     path
   })
-  if(!Array.isArray(data) && data.type === 'file'){
+
+  const files = Array.isArray(data) ? data : [data];
+  const filteredFiles = files.filter((file): file is typeof files[0] => {
+    // Exact match exclusion
+    if (ignoreFiles.includes(file.name)) return false;
+    
+    // Handle wildcard '*.md' - Exclude all Markdown files
+    if (file.name.endsWith('.md')) return false;
+  
+    return true;
+  });
+  
+
+  if(!Array.isArray(filteredFiles) && filteredFiles.type === 'file'){
     return acc + 1;
   }
-  if(Array.isArray(data)){
+
+  if(Array.isArray(filteredFiles)){
     let fileCount = 0;
     const directories: string[] = []
-    for(const item of data){
+    for(const item of filteredFiles){
       if(item.type === 'dir'){
         directories.push(item.path)
       }else{
@@ -76,7 +99,20 @@ export const  indexGithubRepo = async (projectId:string,githubUrl:string,githubT
   if(!docs){
     return;
   }
-  const allEmbeddings = await generateEmbeddings(docs);
+  const filteredDocs = docs.filter(doc => {
+    const source = doc.metadata.source as string;
+    const fileName = source.split('/').pop() ?? '';
+  
+    // Check for exact match
+    if (ignoreFiles.includes(fileName)) return false;
+  
+    // Handle wildcard '*.md' - Ignore all Markdown files
+    if (fileName.endsWith('.md')) return false;
+  
+    return true;
+  });
+
+  const allEmbeddings = await generateEmbeddings(filteredDocs);
   await Promise.allSettled(allEmbeddings.map(async(embedding,index)=> {
     console.log(`processing ${index} of ${allEmbeddings.length}`)
     if(!embedding){

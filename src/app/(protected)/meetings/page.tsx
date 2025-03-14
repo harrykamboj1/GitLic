@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import useRefetch from "@/hooks/use-refetch";
+import { Github } from "lucide-react";
 
 const MeetingPage = () => {
-  const { projectId } = useProject();
+  const { project, projectId } = useProject();
   const refetch = useRefetch();
   const { data: meetings, isLoading } = api.project.getMeetings.useQuery(
     { projectId },
@@ -20,6 +21,18 @@ const MeetingPage = () => {
   );
 
   const deleteMeeting = api.project.deleteMeetings.useMutation();
+
+  if (!project) {
+    return (
+      <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-2">
+        <Github className="size-12 text-muted-foreground" />
+        <h2 className="text-2xl font-bold text-primary">No Project Found</h2>
+        <p className="text-muted-foreground">
+          Please select or create a project to continue
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2 p-4">

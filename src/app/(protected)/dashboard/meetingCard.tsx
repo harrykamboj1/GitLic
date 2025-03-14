@@ -26,6 +26,10 @@ const MeetingCard = () => {
       projectId: string;
     }) => {
       const { meetingUrl, meetingId, projectId } = data;
+      if (projectId == "" || projectId == undefined) {
+        toast.error("No Project Found");
+        return;
+      }
       const response = await axios.post("/api/process-meeting", {
         meetingUrl,
         meetingId,
